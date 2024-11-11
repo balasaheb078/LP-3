@@ -1,0 +1,92 @@
+def print_solution(board):
+    for row in board:
+        for cell in row:
+            print("Q " if cell else ". ", end="")
+        print()
+    print()
+
+def is_safe(board, row, col, N):
+    # Check left side of row
+    for j in range(col):
+        if board[row][j]:
+            return False
+
+    # Check right side of row
+    for j in range(col + 1, N):
+        if board[row][j]:
+            return False
+
+    # Check bottom right diagonal
+    i, j = row, col
+    while i < N and j < N:
+        if board[i][j]:
+            return False
+        i += 1
+        j += 1
+
+    # Check bottom left diagonal
+    i, j = row, col
+    while i >= 0 and j < N:
+        if board[i][j]:
+            return False
+        i -= 1
+        j += 1
+
+    # Check top left diagonal
+    i, j = row, col
+    while i >= 0 and j >= 0:
+        if board[i][j]:
+            return False
+        i -= 1
+        j -= 1
+
+    # Check bottom left diagonal
+    i, j = row, col
+    while j >= 0 and i < N:
+        if board[i][j]:
+            return False
+        i += 1
+        j -= 1
+
+    return True
+
+def solve_nq_util(board, col, N, initial_col):
+    # Base case: If all queens are placed
+    if col >= N:
+        return True
+
+    # Skip the column where the initial queen is placed
+    if col == initial_col:
+        return solve_nq_util(board, col + 1, N, initial_col)
+
+    # Try placing this queen in all rows one by one
+    for i in range(N):
+        if is_safe(board, i, col, N):
+            board[i][col] = 1
+            if solve_nq_util(board, col + 1, N, initial_col):
+                return True
+            board[i][col] = 0  # Backtrack
+
+    return False
+
+def solve_nq():
+    # Get board size and initial queen position
+    N = int(input("Enter size of board: "))
+    row = int(input(f"Enter row of first queen to be placed (1-{N}): ")) - 1
+    col = int(input(f"Enter column of first queen to be placed (1-{N}): ")) - 1
+
+    # Initialize the board
+    board = [[0 for _ in range(N)] for _ in range(N)]
+    board[row][col] = 1
+
+    # Solve the N-Queens problem
+    if not solve_nq_util(board, 0, N, col):
+        print("Solution does not exist")
+        return False
+
+    # Print the solution
+    print_solution(board)
+    return True
+
+if __name__ == "__main__":
+    solve_nq()
