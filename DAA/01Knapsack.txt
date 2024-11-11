@@ -1,0 +1,52 @@
+import java.util.Scanner;
+
+public class Knapsack {
+
+    // Function to solve the 0/1 Knapsack problem using dynamic programming
+    public static int knapsack01(int W, int[] weights, int[] values, int n) {
+        int[][] dp = new int[n + 1][W + 1];
+
+        // Building the dp table
+        for (int i = 1; i <= n; i++) {
+            for (int w = 0; w <= W; w++) {
+                if (weights[i - 1] <= w) {
+                    dp[i][w] = Math.max(values[i - 1] + dp[i - 1][w - weights[i - 1]], dp[i - 1][w]);
+                } else {
+                    dp[i][w] = dp[i - 1][w];
+                }
+            }
+        }
+
+        // The last cell will hold the maximum value in the knapsack
+        return dp[n][W];
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Input number of items and maximum weight of the knapsack
+        System.out.print("Enter the number of items: ");
+        int n = scanner.nextInt();
+        System.out.print("Enter the maximum weight of the knapsack: ");
+        int W = scanner.nextInt();
+
+        // Input values and weights for each item
+        int[] values = new int[n];
+        int[] weights = new int[n];
+        System.out.println("Enter value and weight for each item:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("Item " + (i + 1) + " - Value: ");
+            values[i] = scanner.nextInt();
+            System.out.print("Item " + (i + 1) + " - Weight: ");
+            weights[i] = scanner.nextInt();
+        }
+
+        // Call the knapsack01 function to find the maximum value
+        int maxValue = knapsack01(W, weights, values, n);
+
+        // Output the maximum value that can be obtained in the knapsack
+        System.out.println("Maximum value in Knapsack = " + maxValue);
+
+        scanner.close();
+    }
+}

@@ -1,0 +1,105 @@
+import java.util.*;
+
+class HuffmanCoding {
+
+    // Node structure for the Huffman tree
+    static class HuffmanNode {
+        char data;
+        int freq;
+        HuffmanNode left, right;
+
+        // Constructor to initialize a Huffman node
+        HuffmanNode(char data, int freq) {
+            this.data = data;
+            this.freq = freq;
+            left = right = null;
+        }
+    }
+
+    // Comparator for the priority queue (min-heap), to order nodes by frequency
+    static class Compare implements Comparator<HuffmanNode> {
+        public int compare(HuffmanNode left, HuffmanNode right) {
+            return left.freq - right.freq; // Higher frequency has lower priority
+        }
+    }
+
+    // Recursive function to generate and store the Huffman codes
+    static void generateCodes(HuffmanNode root, String str, Map<Character, String> huffmanCode) {
+        if (root == null) return;
+
+        // If it's a leaf node, it contains one of the input characters
+        if (root.left == null && root.right == null) {
+            huffmanCode.put(root.data, str);
+        }
+
+        // Traverse the left and right children, adding "0" and "1" to the code respectively
+        generateCodes(root.left, str + "0", huffmanCode);
+        generateCodes(root.right, str + "1", huffmanCode);
+    }
+
+    // Function to build the Huffman Tree
+    static HuffmanNode buildHuffmanTree(char[] chars, int[] freqs) {
+        // Priority queue (min-heap) to hold nodes sorted by frequency
+        PriorityQueue<HuffmanNode> minHeap = new PriorityQueue<>(new Compare());
+
+        // Create a leaf node for each character and add it to the min-heap
+        for (int i = 0; i < chars.length; i++) {
+            minHeap.add(new HuffmanNode(chars[i], freqs[i]));
+        }
+
+        // Build the Huffman tree by repeatedly combining two lowest frequency nodes
+        while (minHeap.size() > 1) {
+            // Extract the two nodes with the lowest frequency
+            HuffmanNode left = minHeap.poll();
+            HuffmanNode right = minHeap.poll();
+
+            // Create a new internal node with these two nodes as children
+            int sum = left.freq + right.freq;
+            HuffmanNode node = new HuffmanNode('$', sum);
+            node.left = left;
+            node.right = right;
+
+            // Add the new node back to the min-heap
+            minHeap.add(node);
+        }
+
+        // The root of the Huffman tree is the only node left in the heap
+        return minHeap.poll();
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of characters: ");
+        int n = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        char[] chars = new char[n];
+        int[] freqs = new int[n];
+
+        // Input characters and their respective frequencies
+        System.out.println("Enter characters and their frequencies:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("Character " + (i + 1) + ": ");
+            chars[i] = scanner.nextLine().charAt(0);
+            System.out.print("Frequency of " + chars[i] + ": ");
+            freqs[i] = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+        }
+
+        // Build the Huffman Tree
+        HuffmanNode root = buildHuffmanTree(chars, freqs);
+
+        // Generate Huffman codes for each character
+        Map<Character, String> huffmanCode = new HashMap<>();
+        generateCodes(root, "", huffmanCode);
+
+        // Output the generated Huffman codes
+        System.out.println("\nHuffman Codes:");
+        for (Map.Entry<Character, String> entry : huffmanCode.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+
+        scanner.close();
+    }
+}

@@ -1,0 +1,82 @@
+import java.util.Scanner;
+
+public class NQueens {
+
+    // Function to check if placing a queen at (row, col) is safe
+    public static boolean isSafe(int[][] board, int row, int col, int N) {
+        // Check the row on the left side
+        for (int i = 0; i < col; i++) {
+            if (board[row][i] == 1) return false;
+        }
+
+        // Check the upper diagonal on the left side
+        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 1) return false;
+        }
+
+        // Check the lower diagonal on the left side
+        for (int i = row, j = col; i < N && j >= 0; i++, j--) {
+            if (board[i][j] == 1) return false;
+        }
+
+        // If no queens are attacking, it's safe to place the queen
+        return true;
+    }
+
+    // Utility function to solve the N-Queens problem
+    public static boolean solveNQueensUtil(int[][] board, int col, int N) {
+        // If all queens are placed, return true
+        if (col >= N) return true;
+
+        // Try placing a queen in each row in the current column
+        for (int i = 0; i < N; i++) {
+            // Check if it's safe to place the queen at (i, col)
+            if (isSafe(board, i, col, N)) {
+                // Place the queen
+                board[i][col] = 1;
+
+                // Recursively place the rest of the queens
+                if (solveNQueensUtil(board, col + 1, N)) return true;
+
+                // If placing queen here leads to a solution, leave it as is
+                // Otherwise, backtrack and remove the queen
+                board[i][col] = 0;
+            }
+        }
+
+        // If no placement is possible in this column, return false
+        return false;
+    }
+
+    // Function to print the board with the queens' positions
+    public static void printBoard(int[][] board, int N) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (board[i][j] == 1) System.out.print("Q "); // 'Q' represents a queen
+                else System.out.print(". "); // '.' represents an empty space
+            }
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Input the size of the board
+        System.out.print("Enter the size of the board (N): ");
+        int N = scanner.nextInt();
+
+        // Initialize an N x N board filled with 0's
+        int[][] board = new int[N][N];
+
+        // Attempt to solve the N-Queens problem
+        if (!solveNQueensUtil(board, 0, N)) {
+            System.out.println("Solution does not exist");
+        } else {
+            System.out.println("One of the possible solutions:");
+            printBoard(board, N);
+        }
+
+        scanner.close();
+    }
+}
